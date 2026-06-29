@@ -5,11 +5,11 @@
 #include <functional>
 
 /// Forward declarations — extropian-app depends on extropian-core and extropian-render
-namespace ext::core { class Config; }
-namespace ext::ecs  { class Registry; }
-namespace ext::render { class IRenderer; }
+namespace exd::core { class Config; }
+namespace exd::ecs  { class Registry; }
+namespace exd::render { class IRenderer; }
 
-namespace ext::app {
+namespace exd::app {
 
 class ModeManager;
 class SystemGraph;
@@ -24,7 +24,7 @@ struct IUIHost;
 ///
 /// Usage:
 /// @code
-///   class MyApp : public ext::app::Application {
+///   class MyApp : public exd::app::Application {
 ///       void on_register_systems(SystemGraph& g) override { ... }
 ///       void on_load_ui(IUIHost& ui) override { ... }
 ///   };
@@ -44,10 +44,10 @@ protected:
     /// ── Hooks (override in your app) ──────────────────
 
     /// Parse command-line args into config. Called once before anything else.
-    virtual void on_configure(ext::core::Config& config) {}
+    virtual void on_configure(exd::core::Config& config) {}
 
     /// Create initial ECS entities. Called after systems are registered.
-    virtual void on_setup(ext::ecs::Registry& registry) {}
+    virtual void on_setup(exd::ecs::Registry& registry) {}
 
     /// Register systems with mode affinity and ordering.
     /// This is where you call graph.add<YourSystem>().in_mode(...).
@@ -66,11 +66,11 @@ protected:
     virtual void on_shutdown() {}
 
     /// ── Services ──────────────────────────────────────
-    [[nodiscard]] ext::ecs::Registry&     registry();
-    [[nodiscard]] ext::render::IRenderer& renderer();
+    [[nodiscard]] exd::ecs::Registry&     registry();
+    [[nodiscard]] exd::render::IRenderer& renderer();
     [[nodiscard]] IUIHost&                ui();
     [[nodiscard]] CommandStack&           commands();
-    [[nodiscard]] ext::core::Config&      config();
+    [[nodiscard]] exd::core::Config&      config();
     [[nodiscard]] ModeManager&            modes();
 
     /// ── Asset hot-reload ──────────────────────────────
@@ -81,4 +81,4 @@ private:
     std::unique_ptr<Impl> impl_;
 };
 
-} // namespace ext::app
+} // namespace exd::app

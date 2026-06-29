@@ -5,9 +5,9 @@
 #include <set>
 #include <functional>
 
-namespace ext::ecs { class ISystem; class Registry; }
+namespace exd::ecs { class ISystem; class Registry; }
 
-namespace ext::app {
+namespace exd::app {
 
 /// @brief Ordered, mode-gated collection of ECS systems.
 ///
@@ -44,14 +44,14 @@ public:
     void build();
 
     /// Called each frame. Only runs systems whose mode matches current_mode.
-    void update(ext::ecs::Registry& registry, double dt, int current_mode);
+    void update(exd::ecs::Registry& registry, double dt, int current_mode);
 
     /// Reorder systems by moving one before another (for dependency ordering).
     void order_before(const std::string& before, const std::string& after);
 
 private:
     struct Entry {
-        std::unique_ptr<ext::ecs::ISystem> system;
+        std::unique_ptr<exd::ecs::ISystem> system;
         std::set<int>                     active_modes; ///< empty = always
         bool                              always_active{true};
     };
@@ -59,4 +59,4 @@ private:
     int last_added_{-1};
 };
 
-} // namespace ext::app
+} // namespace exd::app

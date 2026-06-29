@@ -26,7 +26,7 @@ endif()
 find_package(Freetype REQUIRED)
 
 # ── Library target ────────────────────────────────────
-add_library(ext-app STATIC
+add_library(exd-app STATIC
     # Core
     src/application.cpp
     src/mode.cpp
@@ -60,21 +60,21 @@ add_library(ext-app STATIC
     src/rmlui/components/file_browser.cpp
 )
 
-target_include_directories(ext-app PUBLIC include)
-target_include_directories(ext-app PRIVATE src)
+target_include_directories(exd-app PUBLIC include)
+target_include_directories(exd-app PRIVATE src)
 
-target_link_libraries(ext-app PUBLIC
-    ext::core
-    ext::render
+target_link_libraries(exd-app PUBLIC
+    exd::core
+    exd::render
     RmlCore
     RmlControls
     Freetype::Freetype
 )
 
-add_library(ext::app ALIAS ext-app)
+add_library(exd::app ALIAS exd-app)
 
 # Copy RmlUi assets to build directory
-add_custom_command(TARGET ext-app POST_BUILD
+add_custom_command(TARGET exd-app POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_directory
         ${CMAKE_SOURCE_DIR}/assets
         $<TARGET_FILE_DIR:ext-app>/assets
@@ -82,12 +82,12 @@ add_custom_command(TARGET ext-app POST_BUILD
 
 # ── Install ───────────────────────────────────────────
 include(GNUInstallDirs)
-install(TARGETS ext-app EXPORT ext-app-targets
+install(TARGETS exd-app EXPORT exd-app-targets
     ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
 )
 install(DIRECTORY include/ DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 install(DIRECTORY assets/ DESTINATION ${CMAKE_INSTALL_DATADIR}/ext-app/assets)
-install(EXPORT ext-app-targets DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/ext-app)
+install(EXPORT exd-app-targets DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/exd-app)
 
 # ── Tests ─────────────────────────────────────────────
 option(EXT_APP_BUILD_TESTS "Build tests" OFF)

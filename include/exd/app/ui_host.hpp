@@ -6,7 +6,7 @@
 #include <memory>
 #include <vector>
 
-namespace ext::app {
+namespace exd::app {
 
 class Document;
 
@@ -64,4 +64,4 @@ public:
     virtual void update() = 0;
 };
 
-} // namespace ext::app
+} // namespace exd::app

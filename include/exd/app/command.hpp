@@ -5,7 +5,7 @@
 #include <string>
 #include <functional>
 
-namespace ext::app {
+namespace exd::app {
 
 /// @brief A single undoable action.
 ///
@@ -58,4 +58,4 @@ private:
     std::function<void()> change_callback_;
 };
 
-} // namespace ext::app
+} // namespace exd::app

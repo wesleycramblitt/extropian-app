@@ -7,7 +7,7 @@
 #include <functional>
 #include <memory>
 
-namespace ext::app {
+namespace exd::app {
 
 /// @brief Application-defined mode handle.
 ///
@@ -49,4 +49,4 @@ private:
     std::vector<std::function<void(int, int)>> callbacks_;
 };
 
-} // namespace ext::app
+} // namespace exd::app
