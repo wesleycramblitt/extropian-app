@@ -1,0 +1,12 @@
+<!--
+  app_shell.rml — Main application window template.
+  Applications override the body by loading their own documents into it.
+-->
+<rml>
+<head>
+    <link type="text/css" href="assets/theme/_default.rcss" />
+</head>
+<body>
+    <!-- Application documents are loaded here via C++: ui.load_document("...") -->
+</body>
+</rml>

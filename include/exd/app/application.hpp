@@ -4,23 +4,23 @@
 #include <string_view>
 #include <functional>
 
-/// Forward declarations — extropian-app depends on extropian-core and extropian-render
+// Forward declarations
 namespace exd::core { class Config; }
 namespace exd::ecs  { class Registry; }
 namespace exd::render { class IRenderer; }
+namespace exd::app { class IUIHost; }
 
 namespace exd::app {
 
 class ModeManager;
 class SystemGraph;
 class CommandStack;
-struct IUIHost;
 
 /// @brief Application skeleton for all Extropian desktop applications.
 ///
 /// Inherit from this and override the on_* hooks for your app.
-/// Handles: mode management, system registration, UI loading, asset hot-reload,
-/// undo/redo, config persistence.
+/// Handles: mode management, system registration, UI loading (RmlUi),
+/// asset hot-reload, undo/redo, config persistence.
 ///
 /// Usage:
 /// @code
@@ -37,32 +37,16 @@ public:
 
     /// ── Main entry ────────────────────────────────────
     /// Call once. Runs the main loop until the window closes.
-    /// Returns exit code.
     [[nodiscard]] int run();
 
 protected:
     /// ── Hooks (override in your app) ──────────────────
-
-    /// Parse command-line args into config. Called once before anything else.
     virtual void on_configure(exd::core::Config& config) {}
-
-    /// Create initial ECS entities. Called after systems are registered.
     virtual void on_setup(exd::ecs::Registry& registry) {}
-
-    /// Register systems with mode affinity and ordering.
-    /// This is where you call graph.add<YourSystem>().in_mode(...).
     virtual void on_register_systems(SystemGraph& graph) = 0;
-
-    /// Load RmlUi documents for your app's UI.
     virtual void on_load_ui(IUIHost& ui) = 0;
-
-    /// Per-frame update. dt in seconds.
     virtual void on_update(double dt) {}
-
-    /// Called when the mode changes (e.g., Edit → Simulate).
     virtual void on_mode_changed(int from_mode_id, int to_mode_id) {}
-
-    /// Cleanup before exit.
     virtual void on_shutdown() {}
 
     /// ── Services ──────────────────────────────────────

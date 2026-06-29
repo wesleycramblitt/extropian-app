@@ -1,0 +1,16 @@
+<!--
+  console.rml — Log output console with severity filtering.
+-->
+<panel type="collapsible" title="Console">
+    <console id="log-console">
+        <div class="log-entry" type="info">[App] Started successfully.</div>
+    </console>
+    <hbox>
+        <button data-event-click="console_clear">Clear</button>
+        <spacer />
+        <label>Filter:</label>
+        <input type="checkbox" id="filter-error" checked />Errors
+        <input type="checkbox" id="filter-warn"  checked />Warnings
+        <input type="checkbox" id="filter-info"  checked />Info
+    </hbox>
+</panel>
