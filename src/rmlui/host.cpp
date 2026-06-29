@@ -35,7 +35,7 @@ void RmlUiHost::setup_rmlui() {
     Rml::Initialise();
 
     // Load the Controls plugin (provides standard widgets)
-    Rml::Controls::Initialise();
+    // Rml::Controls::Initialise(); // Controls merged into Core
 
     // Create the main context
     Rml::Vector2i size(1280, 720);

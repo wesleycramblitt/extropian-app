@@ -1,4 +1,4 @@
-#include "application.hpp"
+#include <exd/app/application.hpp>
 
 #include <exd/app/mode.hpp>
 #include <exd/app/system_graph.hpp>
@@ -111,8 +111,12 @@ exd::core::Config& Application::config() { return *impl_->config; }
 ModeManager& Application::modes() { return *impl_->mode_manager; }
 
 exd::render::IRenderer& Application::renderer() {
-    // TODO: return actual renderer
-    static exd::render::IRenderer* null_renderer = nullptr;
+    // TODO: Create real renderer via IRenderer::create(backend, window_handle)
+    // For now, return a null reference — apps should call IRenderer::create() directly
+    static auto null_renderer = exd::render::IRenderer::create(exd::render::IRenderer::Backend::Null);
+    if (!null_renderer) {
+        // Headless mode — caller must check
+    }
     return *null_renderer;
 }
 

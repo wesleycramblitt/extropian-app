@@ -7,7 +7,8 @@
 #include <exd/app/mode.hpp>
 #include <exd/app/system_graph.hpp>
 #include <exd/app/command.hpp>
-#include <exd/app/project.hpp>
 #include <exd/app/ui_host.hpp>
-#include <exd/app/layout.hpp>
-#include <exd/app/profile.hpp>
+#include <exd/app/window.hpp>
+#include <exd/app/event_state.hpp>
+#include <exd/app/input_mode.hpp>
+#include <exd/app/camera_controller.hpp>

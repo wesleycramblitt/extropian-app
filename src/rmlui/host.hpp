@@ -7,7 +7,7 @@
 #include <RmlUi/Core/Context.h>
 #include <RmlUi/Core/ElementDocument.h>
 #include <RmlUi/Core/Factory.h>
-#include <RmlUi/Controls.h>
+// RmlUi Controls merged into Core in master
 
 #include <memory>
 #include <string>

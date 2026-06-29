@@ -73,7 +73,7 @@ target_link_libraries(exd-app PUBLIC
     exd::render
     OpenGL::GL
     RmlCore
-    RmlControls
+    
     Freetype::Freetype
 )
 
