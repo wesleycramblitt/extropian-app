@@ -37,6 +37,11 @@ add_library(exd-app STATIC
     src/layout.cpp
     src/profile.cpp
 
+    # Window / event system
+    src/window.cpp
+    src/event_state.cpp
+    src/camera_controller_system.cpp
+
     # Services
     src/services/log_service.cpp
     src/services/clipboard_service.cpp
