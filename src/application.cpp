@@ -1,4 +1,5 @@
 #include <exd/app/application.hpp>
+#include <exd/app/window.hpp>
 
 #include <exd/app/mode.hpp>
 #include <exd/app/system_graph.hpp>
