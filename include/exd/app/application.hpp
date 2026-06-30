@@ -5,17 +5,17 @@
 #include <string_view>
 #include <functional>
 
-// Forward declarations
 namespace exd::core { class Config; }
 namespace exd::ecs  { class Registry; }
-namespace exd::render { class IRenderer; }
 namespace exd::app { class IUIHost; }
 
 namespace exd::app {
 
+class Window;
 class ModeManager;
 class SystemGraph;
 class CommandStack;
+struct IUIHost;
 
 /// @brief Application skeleton for all Extropian desktop applications.
 ///
@@ -52,7 +52,7 @@ protected:
 
     /// ── Services ──────────────────────────────────────
     [[nodiscard]] exd::ecs::Registry&     registry();
-    [[nodiscard]] exd::render::IRenderer& renderer();
+    [[nodiscard]] Window&                  window();
     [[nodiscard]] IUIHost&                ui();
     [[nodiscard]] CommandStack&           commands();
     [[nodiscard]] exd::core::Config&      config();
