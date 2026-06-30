@@ -6,7 +6,7 @@
 #include <exd/app/ui_host.hpp>
 
 // RmlUi host (concrete implementation used by default)
-#include "../src/rmlui/host.hpp"
+// RmlUi disabled: #include "../src/rmlui/host.hpp"
 
 #include <exd/core/config.hpp>
 #include <exd/ecs/registry.hpp>
@@ -53,7 +53,8 @@ int Application::run() {
     on_configure(*impl_->config);
 
     // 2. Create UI (RmlUi backend by default)
-    impl_->ui = IUIHost::create(IUIHost::Backend::RmlUi, nullptr);
+    // RmlUi disabled
+    // impl_->ui = IUIHost::create(IUIHost::Backend::RmlUi, nullptr);
 
     // 3. Load UI documents
     if (impl_->ui) {
