@@ -46,7 +46,7 @@ void CameraControllerSystem::update(exd::ecs::Registry& registry, Window& window
                                     ? cc.sprint_mult : 1.0f);
         const float step = s * dt;
 
-        Vec3 move{0, 0, 0};
+        Vec3f move{0, 0, 0};
         auto& ks = window.event_state.keyboard_state;
         if (ks[SDL_SCANCODE_W]) move = move + front * step;
         if (ks[SDL_SCANCODE_S]) move = move - front * step;
