@@ -1,4 +1,5 @@
 // ColorPicker component — C++ stub.
+#include <string>
 // In the future: HSV color wheel with alpha slider.
 
 namespace exd::app::rmlui {
