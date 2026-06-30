@@ -3,6 +3,7 @@
 #include <exd/app/mode.hpp>
 #include <exd/app/system_graph.hpp>
 #include <exd/app/command.hpp>
+#include <exd/render/renderer.hpp>
 #include <exd/app/ui_host.hpp>
 #include <exd/app/window.hpp>
 
