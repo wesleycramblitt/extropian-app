@@ -82,8 +82,6 @@ add_library(exd-app STATIC
 
 target_include_directories(exd-app PUBLIC "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>")
 target_include_directories(exd-app PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
-# RmlUi include path (needed for internal headers that use RmlUi)
-target_include_directories(exd-app SYSTEM PUBLIC ${rmlui_SOURCE_DIR}/Include)
 
 target_link_libraries(exd-app PUBLIC
     exd::core
