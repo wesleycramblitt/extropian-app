@@ -4,6 +4,7 @@
 #include <vector>
 #include <set>
 #include <functional>
+#include <string>
 
 namespace exd::ecs { class ISystem; class Registry; }
 
@@ -24,10 +25,13 @@ public:
     SystemGraph() = default;
 
     /// Register a system type. Returns a builder for mode constraints.
+    /// The system must have an `update(Registry&, double)` method (duck typing via lambda capture).
     template <typename T, typename... Args>
     SystemGraph& add(Args&&... args) {
-        auto sys = std::make_unique<T>(std::forward<Args>(args)...);
-        entries_.push_back(Entry{std::move(sys), std::set<int>{}, true});
+        auto sys = std::make_shared<T>(std::forward<Args>(args)...);
+        entries_.push_back(Entry{[sys](exd::ecs::Registry& r, double dt) {
+            sys->update(r, dt);
+        }, std::set<int>{}, true});
         last_added_ = static_cast<int>(entries_.size()) - 1;
         return *this;
     }
@@ -52,9 +56,9 @@ public:
 
 private:
     struct Entry {
-        std::unique_ptr<exd::ecs::ISystem> system;
-        std::set<int>                     active_modes; ///< empty = always
-        bool                              always_active{true};
+        std::function<void(exd::ecs::Registry&, double)> callback;
+        std::set<int> active_modes;
+        bool always_active{true};
     };
     std::vector<Entry> entries_;
     int last_added_{-1};

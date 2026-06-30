@@ -37,8 +37,8 @@ void SystemGraph::update(exd::ecs::Registry& registry, double dt, int current_mo
     for (auto& entry : entries_) {
         bool should_run = entry.always_active ||
                           entry.active_modes.find(current_mode) != entry.active_modes.end();
-        if (should_run && entry.system)
-            entry.system->update(registry, dt);
+        if (should_run && entry.callback)
+            entry.callback(registry, dt);
     }
 }
 
