@@ -30,7 +30,7 @@ find_package(OpenGL REQUIRED)
 include(FetchContent)
 FetchContent_Declare(RmlUi
     GIT_REPOSITORY https://github.com/mikke89/RmlUi.git
-    GIT_TAG master
+    GIT_TAG 6.0
 )
 set(RMLUI_BACKEND SDL_GL3 CACHE STRING "" FORCE)
 FetchContent_MakeAvailable(RmlUi)
