@@ -94,10 +94,6 @@ exd::core::Config& Application::config() { return *impl_->config; }
 ModeManager& Application::modes() { return *impl_->mode_manager; }
 Window& Application::window() { return *impl_->window; }
 
-exd::render::IRenderer& Application::renderer() {
-    static auto null = exd::render::IRenderer::create(exd::render::IRenderer::Backend::Null);
-    return *null;
-}
 
 void Application::watch_asset(const std::string&, std::function<void()>) {}
 
