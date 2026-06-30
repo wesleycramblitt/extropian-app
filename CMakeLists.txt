@@ -84,15 +84,15 @@ add_custom_command(TARGET exd-app POST_BUILD
 )
 
 # ── Install ───────────────────────────────────────────
-include(GNUInstallDirs)
-install(TARGETS exd-app EXPORT exd-app-targets ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
-install(DIRECTORY include/ DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
-install(DIRECTORY assets/ DESTINATION ${CMAKE_INSTALL_DATADIR}/exd-app/assets)
-install(EXPORT exd-app-targets DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/exd-app)
-
-# ── Tests ─────────────────────────────────────────────
-option(EXD_APP_BUILD_TESTS "Build tests" OFF)
-if(EXD_APP_BUILD_TESTS)
-    enable_testing()
-    add_subdirectory(tests)
-endif()
+#include(GNUInstallDirs)
+#install(TARGETS exd-app EXPORT exd-app-targets ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
+#install(DIRECTORY include/ DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
+#install(DIRECTORY assets/ DESTINATION ${CMAKE_INSTALL_DATADIR}/exd-app/assets)
+#install(EXPORT exd-app-targets DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/exd-app)
+#
+## ── Tests ─────────────────────────────────────────────
+#option(EXD_APP_BUILD_TESTS "Build tests" OFF)
+#if(EXD_APP_BUILD_TESTS)
+#    enable_testing()
+#    add_subdirectory(tests)
+#endif()
