@@ -35,12 +35,12 @@ void CameraControllerSystem::update(exd::ecs::Registry& registry, Window& window
         if (cc.yaw < -two_pi) cc.yaw += two_pi;
 
         Quat q_yaw = Quat::from_axis_angle(world_up, cc.yaw);
-        Vec3 local_right = (q_yaw * Vec3{1.0f, 0.0f, 0.0f}).norm();
+        Vec3 local_right = (q_yaw * Vec3{1.0f, 0.0f, 0.0f}).normalized();
         Quat q_pitch = Quat::from_axis_angle(local_right, cc.pitch);
 
         // Compute movement
-        Vec3 cam_fwd = ((q_pitch * q_yaw).norm() * Vec3{0.0f, 0.0f, -1.0f}).norm();
-        Vec3 front = (cam_fwd - world_up * cam_fwd.dot(world_up)).norm();
+        Vec3 cam_fwd = ((q_pitch * q_yaw).normalized() * Vec3{0.0f, 0.0f, -1.0f}).normalized();
+        Vec3 front = (cam_fwd - world_up * cam_fwd.dot(world_up)).normalized();
 
         float s = cc.move_speed * (window.event_state.keyboard_state[SDL_SCANCODE_LSHIFT]
                                     ? cc.sprint_mult : 1.0f);

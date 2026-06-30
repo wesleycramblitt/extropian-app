@@ -27,7 +27,7 @@ public:
     template <typename T, typename... Args>
     SystemGraph& add(Args&&... args) {
         auto sys = std::make_unique<T>(std::forward<Args>(args)...);
-        entries_.push_back({std::move(sys), {}, true});
+        entries_.push_back(Entry{std::move(sys), std::set<int>{}, true});
         last_added_ = static_cast<int>(entries_.size()) - 1;
         return *this;
     }
