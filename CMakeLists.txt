@@ -80,7 +80,7 @@ add_library(exd-app STATIC
     src/rmlui/components/file_browser.cpp
 )
 
-target_include_directories(exd-app PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
+target_include_directories(exd-app PUBLIC "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>")
 target_include_directories(exd-app PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
 
 target_link_libraries(exd-app PUBLIC
