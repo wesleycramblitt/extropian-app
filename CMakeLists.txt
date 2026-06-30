@@ -32,8 +32,8 @@ FetchContent_Declare(RmlUi
     GIT_REPOSITORY https://github.com/mikke89/RmlUi.git
     GIT_TAG master
 )
-# Disable building RmlUi's own backends — we provide our own
-set(RMLUI_BACKEND NONE CACHE STRING "" FORCE)
+# Disable building RmlUi's own backend samples — we provide our own render interface
+set(RMLUI_BACKEND X11_GL2 CACHE STRING "" FORCE)
 FetchContent_MakeAvailable(RmlUi)
 
 # Freetype — font rendering for RmlUi
