@@ -39,6 +39,8 @@ void SystemGraph::update(exd::ecs::Registry& registry, double dt, int current_mo
                           entry.active_modes.find(current_mode) != entry.active_modes.end();
         std::printf("[SystemGraph] run=%d mode=%d
 ", should_run, current_mode);
+            std::printf("[SystemGraph] run=%d mode=%d
+", (int)should_run, current_mode);
             if (should_run && entry.callback)
             entry.callback(registry, dt);
     }
