@@ -5,7 +5,7 @@
 #include <exd/app/command.hpp>
 #include <exd/render/renderer.hpp>
 #include <exd/app/ui_host.hpp>
-#include <exd/app/window.hpp>
+#include "rmlui/host.hpp"
 
 #include <exd/core/config.hpp>
 #include <exd/ecs/registry.hpp>
@@ -50,7 +50,15 @@ int Application::run() {
     // 2. Create window (SDL3 + OpenGL)
     impl_->window = std::make_unique<Window>();
 
-    // 3. Register systems
+    // 3. Create UI (RmlUi)
+    impl_->ui = IUIHost::create(IUIHost::Backend::RmlUi, impl_->window->sdl_window);
+
+    // 4. Load UI documents
+    if (impl_->ui) {
+        on_load_ui(*impl_->ui);
+    }
+
+    // 5. Register systems
     impl_->system_graph = std::make_unique<SystemGraph>();
     on_register_systems(*impl_->system_graph);
     impl_->system_graph->build();

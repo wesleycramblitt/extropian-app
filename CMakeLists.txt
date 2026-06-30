@@ -26,12 +26,15 @@ if(NOT TARGET exd::render)
 endif()
 find_package(OpenGL REQUIRED)
 
-# RmlUi — disabled for initial build
-# include(FetchContent)
-# FetchContent_Declare(RmlUi ...)
-# set(RMLUI_BACKEND "" ...)
-# FetchContent_MakeAvailable(RmlUi)
-# find_package(Freetype REQUIRED)
+# RmlUi — HTML/CSS UI library
+include(FetchContent)
+FetchContent_Declare(RmlUi
+    GIT_REPOSITORY https://github.com/mikke89/RmlUi.git
+    GIT_TAG master
+)
+set(RMLUI_BACKEND SDL_GL3 CACHE STRING "" FORCE)
+FetchContent_MakeAvailable(RmlUi)
+find_package(Freetype REQUIRED)
 
 # ── Library target ────────────────────────────────────
 add_library(exd-app STATIC
@@ -57,23 +60,21 @@ add_library(exd-app STATIC
     src/services/file_dialog_service.cpp
     src/services/notification_service.cpp
 
-    # RmlUi integration — render interface, system interface, host, data binding
-    # Disabled for initial build: uncomment when RmlUi+X11+Freetype deps are resolved
-    # src/rmlui/host.cpp
-    # src/rmlui/render_interface.cpp
-    # src/rmlui/system_interface.cpp
-    # src/rmlui/data_binding.cpp
-    # src/rmlui/ui_host_factory.cpp
+    # RmlUi integration
+    src/rmlui/host.cpp
+    src/rmlui/render_interface.cpp
+    src/rmlui/system_interface.cpp
+    src/rmlui/data_binding.cpp
+    src/rmlui/ui_host_factory.cpp
 
-    # RmlUi reusable components (C++ side)
-    # Disabled for initial build
-    # src/rmlui/components/property_editor.cpp
-    # src/rmlui/components/tree_view.cpp
-    # src/rmlui/components/viewport_3d.cpp
-    # src/rmlui/components/console.cpp
-    # src/rmlui/components/curve_editor.cpp
-    # src/rmlui/components/color_picker.cpp
-    # src/rmlui/components/file_browser.cpp
+    # RmlUi reusable components
+    src/rmlui/components/property_editor.cpp
+    src/rmlui/components/tree_view.cpp
+    src/rmlui/components/viewport_3d.cpp
+    src/rmlui/components/console.cpp
+    src/rmlui/components/curve_editor.cpp
+    src/rmlui/components/color_picker.cpp
+    src/rmlui/components/file_browser.cpp
 )
 
 #target_include_directories(exd-app PUBLIC "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>")
@@ -87,8 +88,8 @@ target_link_libraries(exd-app PUBLIC
     exd::core
     exd::render
     OpenGL::GL
-    # RmlUi - disabled for initial build
-    # RmlCore  RmlControls  Freetype::Freetype
+    RmlCore
+    Freetype::Freetype
 )
 
 add_library(exd::app ALIAS exd-app)
