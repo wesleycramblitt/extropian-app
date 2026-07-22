@@ -14,6 +14,9 @@ if(NOT TARGET exd::core)
         GIT_REPOSITORY https://github.com/wesleycramblitt/extropian-core.git
         GIT_TAG main
     )
+    # Core tests pull in doctest 2.4.11 which is incompatible with
+    # modern CMake — disable them since we only need the library.
+    set(EXT_CORE_BUILD_TESTS OFF CACHE BOOL "" FORCE)
     FetchContent_MakeAvailable(exd-core)
 endif()
 
@@ -80,6 +83,7 @@ if(EXD_APP_BUILD_TESTS)
         tests/test_window_state.cpp
         tests/test_services.cpp
         tests/test_application.cpp
+        tests/test_umbrella.cpp
     )
 
     target_link_libraries(exd-app-tests PRIVATE

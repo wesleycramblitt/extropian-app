@@ -18,6 +18,14 @@ public:
         return sc < SDL_SCANCODE_COUNT && key_up_[sc];
     }
 
+    /// Reset all per-frame key-up flags (called at the start of each poll).
+    void reset_keys() { key_up_.fill(false); }
+
+    /// Mark a key as just-released this frame.
+    void set_key_up(SDL_Scancode sc) {
+        if (sc < SDL_SCANCODE_COUNT) key_up_[sc] = true;
+    }
+
     const bool* keyboard_state = nullptr;
     SDL_Event* events = nullptr;
     int num_events = 0;
@@ -25,7 +33,6 @@ public:
     float mouse_rel_y = 0;
 
 private:
-    friend class Window;
     std::array<bool, SDL_SCANCODE_COUNT> key_up_ = {};
 };
 

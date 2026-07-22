@@ -39,6 +39,23 @@ TEST_CASE("Clipboard: empty string", "[services][clipboard]") {
     SUCCEED("empty clipboard handled");
 }
 
+TEST_CASE("Clipboard: long string does not crash", "[services][clipboard]") {
+    // 10 KB of garbage should not crash the clipboard wrapper
+    std::string long_str(10'000, 'X');
+    CHECK_NOTHROW(clipboard_set(long_str));
+    SUCCEED("10 KB string set without crash");
+}
+
+TEST_CASE("Clipboard: UTF-8 text", "[services][clipboard]") {
+    // Use a normal string literal (the source encoding provides UTF-8 bytes).
+    // Avoid u8"" prefix which produces char8_t[] incompatible with std::string.
+    CHECK_NOTHROW(clipboard_set("\xe3\x81\x93\xe3\x82\x93\xe3\x81\xab\xe3\x81\xa1\xe3\x81\xaf"
+                                " \xe2\x80\x94 Hello, world! \xe2\x9c\xa8"
+                                " Caf\xc3\xa9 na\xc3\xafve r\xc3\xa9sum\xc3\xa9"
+                                " \xe2\x82\xac" "20"));
+    SUCCEED("UTF-8 clipboard text set without crash");
+}
+
 // ── File Dialog ──────────────────────────────────────────
 
 TEST_CASE("FileDialog: callback invoked with empty string", "[services][file_dialog]") {

@@ -76,7 +76,7 @@ void Window::get_dimensions(int& width, int& height, float& aspect) const {
 void Window::poll_events() {
     SDL_PumpEvents();
     event_buffer.clear();
-    event_state.key_up_.fill(false);
+    event_state.reset_keys();
 
     SDL_Event e;
     while (SDL_PollEvent(&e)) event_buffer.push_back(e);
@@ -97,8 +97,7 @@ void Window::poll_events() {
             grid_visible = !grid_visible;
         }
         if (ev.type == SDL_EVENT_KEY_UP) {
-            if (ev.key.scancode < SDL_SCANCODE_COUNT)
-                event_state.key_up_[ev.key.scancode] = true;
+            event_state.set_key_up(ev.key.scancode);
         }
         if (ev.type == SDL_EVENT_MOUSE_MOTION) {
             mouse_rel_x += (float)ev.motion.xrel;

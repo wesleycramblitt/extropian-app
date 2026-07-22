@@ -4,6 +4,8 @@
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/catch_approx.hpp>
 
+#include <memory>
+
 namespace exd::app {
 namespace {
 
@@ -109,6 +111,23 @@ TEST_CASE("WindowState: zero dimensions produce aspect 1.0", "[window_state]") {
     CHECK(w == 0);
     CHECK(h == 0);
     CHECK(aspect == 1.0f);
+}
+
+TEST_CASE("WindowState: polymorphic deletion through base pointer", "[window_state]") {
+    // Verify virtual destructor works — derived object deleted via base pointer
+    static bool destroyed = false;
+    struct DestructorTrackingState : public WindowState {
+        ~DestructorTrackingState() override { destroyed = true; }
+        void get_dimensions(int& w, int& h, float& a) const override { w = h = 0; a = 1.0f; }
+        bool was_key_released(int) const override { return false; }
+    };
+
+    destroyed = false;
+    {
+        std::unique_ptr<WindowState> ptr = std::make_unique<DestructorTrackingState>();
+        CHECK_FALSE(destroyed);
+    }
+    CHECK(destroyed);
 }
 
 } // namespace
