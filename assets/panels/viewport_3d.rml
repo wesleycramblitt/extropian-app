@@ -1,8 +1,0 @@
-<!--
-  viewport_3d.rml — Embeds the 3D render viewport.
-  The C++ renderer renders to a framebuffer texture displayed here.
--->
-<viewport id="main-viewport">
-    <!-- 3D rendering is handled by the sci-render backend.
-         This element reserves the space and receives viewport events. -->
-</viewport>

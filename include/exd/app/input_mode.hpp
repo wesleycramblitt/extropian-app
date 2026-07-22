@@ -1,10 +1,6 @@
 #pragma once
 
-#include <exd/core/window_state.hpp>
+#include <exd/app/window_state.hpp>
 
-namespace exd::app {
-
-/// Re-exported from exd::core to maintain backward-compatible include paths.
-using InputMode = exd::core::InputMode;
-
-} // namespace exd::app
+// InputMode is defined in window_state.hpp (namespace exd::app).
+// This header exists for backward-compatible include paths.

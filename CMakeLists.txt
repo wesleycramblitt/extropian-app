@@ -61,3 +61,52 @@ target_link_libraries(exd-app PUBLIC
 )
 
 add_library(exd::app ALIAS exd-app)
+
+# ── Tests ──────────────────────────────────────────────
+option(EXD_APP_BUILD_TESTS "Build extropian-app tests" ON)
+
+if(EXD_APP_BUILD_TESTS)
+    enable_testing()
+
+    include(FetchContent)
+    FetchContent_Declare(Catch2
+        GIT_REPOSITORY https://github.com/catchorg/Catch2.git
+        GIT_TAG v3.8.0
+    )
+    FetchContent_MakeAvailable(Catch2)
+
+    add_executable(exd-app-tests
+        tests/test_event_state.cpp
+        tests/test_window_state.cpp
+        tests/test_services.cpp
+        tests/test_application.cpp
+    )
+
+    target_link_libraries(exd-app-tests PRIVATE
+        exd::app
+        Catch2::Catch2WithMain
+    )
+
+    target_include_directories(exd-app-tests PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/include
+    )
+
+    # Separate executable for tests that need a display (SDL3)
+    add_executable(exd-app-tests-window
+        tests/test_window.cpp
+    )
+
+    target_link_libraries(exd-app-tests-window PRIVATE
+        exd::app
+        Catch2::Catch2WithMain
+    )
+
+    target_include_directories(exd-app-tests-window PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/include
+    )
+
+    include(CTest)
+    add_test(NAME exd-app-unit-tests COMMAND exd-app-tests)
+    add_test(NAME exd-app-window-tests COMMAND exd-app-tests-window)
+    set_tests_properties(exd-app-window-tests PROPERTIES SKIP_RETURN_CODE 4)
+endif()
