@@ -1,11 +1,10 @@
 #pragma once
 
+#include <exd/core/window_state.hpp>
+
 namespace exd::app {
 
-/// Toggles between first-person camera control and UI interaction mode.
-enum class InputMode {
-    FPS,  ///< Relative mouse, camera moves with WASD+Mouse
-    UI    ///< Absolute mouse, UI captures input, camera frozen
-};
+/// Re-exported from exd::core to maintain backward-compatible include paths.
+using InputMode = exd::core::InputMode;
 
 } // namespace exd::app

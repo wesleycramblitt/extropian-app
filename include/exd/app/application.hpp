@@ -1,65 +1,45 @@
 #pragma once
 
 #include <memory>
-#include <string>
-#include <string_view>
-#include <functional>
-
-namespace exd::core { class Config; }
-namespace exd::ecs  { class Registry; }
-namespace exd::app { class IUIHost; }
 
 namespace exd::app {
 
 class Window;
-class ModeManager;
-class SystemGraph;
-class CommandStack;
-struct IUIHost;
 
-/// @brief Application skeleton for all Extropian desktop applications.
+/// Minimal application skeleton.
 ///
-/// Inherit from this and override the on_* hooks for your app.
-/// Handles: mode management, system registration, UI loading (RmlUi),
-/// asset hot-reload, undo/redo, config persistence.
+/// Creates an SDL3 + OpenGL window and runs the main loop.
+/// Inherit and override on_startup / on_update / on_shutdown.
 ///
 /// Usage:
 /// @code
 ///   class MyApp : public exd::app::Application {
-///       void on_register_systems(SystemGraph& g) override { ... }
-///       void on_load_ui(IUIHost& ui) override { ... }
+///       void on_startup() override { ... }
+///       void on_update(float dt) override { ... }
 ///   };
-///   int main(int argc, char** argv) { return MyApp(argc, argv).run(); }
+///   int main() { return MyApp().run(); }
 /// @endcode
 class Application {
 public:
-    Application(int argc = 0, char** argv = nullptr);
+    Application();
     virtual ~Application();
 
-    /// ── Main entry ────────────────────────────────────
-    /// Call once. Runs the main loop until the window closes.
+    /// Run the main loop. Blocks until the window closes.
+    /// Returns 0 on clean exit, nonzero on error.
     [[nodiscard]] int run();
 
+    /// Access the underlying window (SDL3 + OpenGL).
+    [[nodiscard]] Window& window();
+
 protected:
-    /// ── Hooks (override in your app) ──────────────────
-    virtual void on_configure(exd::core::Config& config) {}
-    virtual void on_setup(exd::ecs::Registry& registry) {}
-    virtual void on_register_systems(SystemGraph& graph) = 0;
-    virtual void on_load_ui(IUIHost& ui) = 0;
-    virtual void on_update(double dt) {}
-    virtual void on_mode_changed(int from_mode_id, int to_mode_id) {}
+    /// Called once after the window is created, before the first frame.
+    virtual void on_startup() {}
+
+    /// Called every frame. dt is wall-clock seconds since the last frame.
+    virtual void on_update(float dt) {}
+
+    /// Called after the main loop exits, before destruction.
     virtual void on_shutdown() {}
-
-    /// ── Services ──────────────────────────────────────
-    [[nodiscard]] exd::ecs::Registry&     registry();
-    [[nodiscard]] Window&                  window();
-    [[nodiscard]] IUIHost&                ui();
-    [[nodiscard]] CommandStack&           commands();
-    [[nodiscard]] exd::core::Config&      config();
-    [[nodiscard]] ModeManager&            modes();
-
-    /// ── Asset hot-reload ──────────────────────────────
-    void watch_asset(const std::string& path, std::function<void()> on_change);
 
 private:
     struct Impl;

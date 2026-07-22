@@ -1,6 +1,7 @@
 #pragma once
 
 #include <SDL3/SDL.h>
+#include <exd/core/window_state.hpp>
 #include <exd/app/event_state.hpp>
 #include <exd/app/input_mode.hpp>
 #include <vector>
@@ -8,29 +9,31 @@
 namespace exd::app {
 
 /// SDL3 window wrapper with OpenGL context and event polling.
-class Window {
+///
+/// Inherits from exd::core::WindowState to expose dimension / input /
+/// toggle values to the renderer without requiring the renderer to
+/// depend on the full application framework.
+class Window : public exd::core::WindowState {
 public:
     Window();
     ~Window();
 
     void die(const char* msg);
     void swap_buffers();
-    void get_dimensions(int& width, int& height, float& aspect) const;
+    void get_dimensions(int& width, int& height, float& aspect) const override;
+    bool was_key_released(int scancode) const override;
     void poll_events();
 
-    InputMode input_mode() const { return input_mode_; }
     void set_input_mode(InputMode mode);
 
     bool should_close = false;
-    bool wireframe = false;
-    bool grid_visible = true;
     SDL_Window* sdl_window = nullptr;
     SDL_GLContext gl_context = nullptr;
     EventState event_state;
     std::vector<SDL_Event> event_buffer;
 
-private:
-    InputMode input_mode_ = InputMode::FPS;
+    // grid_visible, wireframe, input_mode, keyboard_state,
+    // mouse_rel_x/y are inherited from core::WindowState.
 };
 
 } // namespace exd::app

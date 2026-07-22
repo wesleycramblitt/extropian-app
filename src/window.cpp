@@ -88,10 +88,10 @@ void Window::poll_events() {
     for (const auto& ev : event_buffer) {
         if (ev.type == SDL_EVENT_QUIT) should_close = true;
         if (ev.type == SDL_EVENT_KEY_DOWN && ev.key.scancode == SDL_SCANCODE_ESCAPE) {
-            if (input_mode_ == InputMode::FPS) should_close = true;
+            if (input_mode == InputMode::FPS) should_close = true;
         }
         if (ev.type == SDL_EVENT_KEY_DOWN && ev.key.scancode == SDL_SCANCODE_Z) {
-            set_input_mode(input_mode_ == InputMode::FPS ? InputMode::UI : InputMode::FPS);
+            set_input_mode(input_mode == InputMode::FPS ? InputMode::UI : InputMode::FPS);
         }
         if (ev.type == SDL_EVENT_KEY_DOWN && ev.key.scancode == SDL_SCANCODE_G) {
             grid_visible = !grid_visible;
@@ -111,11 +111,20 @@ void Window::poll_events() {
 
     event_state.set_state(event_buffer.data(), static_cast<int>(event_buffer.size()),
                            keys, mouse_rel_x, mouse_rel_y);
+
+    // ── Sync state to base class for renderer access ──
+    keyboard_state = event_state.keyboard_state;
+    this->mouse_rel_x = event_state.mouse_rel_x;
+    this->mouse_rel_y = event_state.mouse_rel_y;
 }
 
 void Window::set_input_mode(InputMode mode) {
-    input_mode_ = mode;
+    input_mode = mode;  // sets base-class member for renderer
     SDL_SetWindowRelativeMouseMode(sdl_window, mode == InputMode::FPS);
+}
+
+bool Window::was_key_released(int scancode) const {
+    return event_state.was_key_released(static_cast<SDL_Scancode>(scancode));
 }
 
 } // namespace exd::app

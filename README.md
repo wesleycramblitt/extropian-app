@@ -1,32 +1,22 @@
 # extropian-app
 
-**Application framework with RmlUi integration.**
+**Minimal application framework.**
 
-Provides the skeleton for all Extropian desktop applications: mode management, system graph ordering, undo/redo, UI document loading, and hot-reload.
+Provides a lightweight skeleton for Extropian desktop applications:
+creating an SDL3 + OpenGL window, polling input events, and running
+the main loop.
 
-Depends on `extropian-core` and `extropian-render`. Does NOT depend on `extropian-physics`.
+Depends on `extropian-core`. Does NOT depend on `extropian-render`.
 
 ## What It Provides
 
 | Feature | Description |
 |---------|-------------|
-| `ext::app::Application` | Lifecycle skeleton — inherit and override `on_*` hooks |
-| `ext::app::ModeManager` | Mode state machine (Edit/Simulate/Postprocess or MainMenu/Play/PvP) |
-| `ext::app::SystemGraph` | Register systems with mode affinity + ordering |
-| `ext::app::CommandStack` | Generic undo/redo with `ICommand` |
-| `ext::app::IUIHost` | RmlUi document loading, data binding, event wiring |
-| Reusable components | PropertyEditor, TreeView, Viewport3D, Console, CurveEditor |
-
-## RmlUi Integration
-
-UIs are defined in RML (HTML-like markup) and RCSS (CSS-like stylesheets). C++ wires data bindings and event handlers. RmlUi provides hot-reload — edit `.rml`/`.rcss` files and see changes instantly without recompiling.
-
-```cpp
-auto& ui = app.ui();
-ui.load_document("panels/solver_config.rml");
-ui.bind("domain.nx", [&] { return domain_.nx; });
-ui.on("onSolve", [&] { solver.run(); });
-```
+| `exd::app::Application` | Minimal lifecycle — inherit and override `on_startup` / `on_update` / `on_shutdown` |
+| `exd::app::Window` | SDL3 + OpenGL window creation, event polling, buffer swap, input state |
+| `exd::app::EventState` | Per-frame keyboard/mouse input snapshot |
+| `exd::app::InputMode` | Re-export from core: `FPS` vs `UI` input modes |
+| Platform services | Clipboard, file dialogs, notifications (thin SDL3 wrappers) |
 
 ## Building
 
@@ -35,7 +25,7 @@ cmake -S . -B build -G Ninja
 cmake --build build
 ```
 
-Requires: `extropian-core`, `extropian-render`, RmlUi, Freetype.
+Requires: `extropian-core`, OpenGL, SDL3.
 
 ## License
 
