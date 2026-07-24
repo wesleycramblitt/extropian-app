@@ -1,13 +1,13 @@
 #include <exd/app/application.hpp>
-
-#include <cstdio>
-#include <chrono>
+#include <exd/core/logging.hpp>
+#include <exd/core/clock.hpp>
 
 namespace exd::app {
 
 struct Application::Impl {
     std::unique_ptr<Window> window;
     bool running = false;
+    exd::core::FrameClock frame_clock;
 };
 
 Application::Application(const WindowDesc& desc)
@@ -22,22 +22,18 @@ Application::~Application() {
 
 int Application::run() {
     if (!impl_->window->is_valid()) {
-        std::fprintf(stderr, "[App] Window creation failed — aborting run()\n");
+        exd::core::log_error("[App] Window creation failed — aborting run()");
         return 1;
     }
 
-    std::printf("[App] Starting...\n");
+    exd::core::log_info("[App] Starting...");
 
     on_startup();
 
     impl_->running = true;
-    using clock = std::chrono::steady_clock;
-    auto last_frame = clock::now();
 
     while (impl_->running && !impl_->window->should_close()) {
-        auto frame_start = clock::now();
-        last_dt_ = std::chrono::duration<float>(frame_start - last_frame).count();
-        last_frame = frame_start;
+        last_dt_ = static_cast<float>(impl_->frame_clock.mark());
 
         impl_->window->poll_events();
 

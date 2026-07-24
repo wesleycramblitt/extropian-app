@@ -1,7 +1,7 @@
 #include <exd/app/window.hpp>
 #include <exd/core/macros.hpp>
+#include <exd/core/logging.hpp>
 #include <glad/gl.h>
-#include <iostream>
 #include <cstdlib>
 
 namespace exd::app {
@@ -21,7 +21,7 @@ Window::Window(const WindowDesc& desc)
     : desc_(desc)
 {
     if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_GAMEPAD) < 0) {
-        std::cerr << "SDL could not initialize! SDL_Error: " << SDL_GetError() << std::endl;
+        exd::core::log_error("SDL could not initialize! SDL_Error: %s", SDL_GetError());
         return;
     }
 
@@ -35,16 +35,14 @@ Window::Window(const WindowDesc& desc)
     sdl_window_ = SDL_CreateWindow(desc.title.c_str(),
                                    desc.width, desc.height, flags);
     if (!sdl_window_) {
-        std::cerr << "Window could not be created! SDL_Error: "
-                  << SDL_GetError() << std::endl;
+        exd::core::log_error("Window could not be created! SDL_Error: %s", SDL_GetError());
         return;
     }
 
     // ── Create GL context ──
     gl_context_ = SDL_GL_CreateContext(sdl_window_);
     if (!gl_context_) {
-        std::cerr << "OpenGL context could not be created! SDL_Error: "
-                  << SDL_GetError() << std::endl;
+        exd::core::log_error("OpenGL context could not be created! SDL_Error: %s", SDL_GetError());
         SDL_DestroyWindow(sdl_window_);
         sdl_window_ = nullptr;
         return;
@@ -53,7 +51,7 @@ Window::Window(const WindowDesc& desc)
 
     // ── Load GL ──
     if (!gladLoadGL((GLADloadfunc)SDL_GL_GetProcAddress)) {
-        std::cerr << "Failed to initialize OpenGL loader!" << std::endl;
+        exd::core::log_error("Failed to initialize OpenGL loader!");
         SDL_GL_DestroyContext(gl_context_);
         SDL_DestroyWindow(sdl_window_);
         SDL_Quit();
