@@ -1,10 +1,9 @@
 #pragma once
 
 #include <memory>
+#include <exd/app/window.hpp>
 
 namespace exd::app {
-
-class Window;
 
 /// Minimal application skeleton.
 ///
@@ -14,6 +13,8 @@ class Window;
 /// Usage:
 /// @code
 ///   class MyApp : public exd::app::Application {
+///   public:
+///       MyApp() : Application(WindowDesc{.title = "My App"}) {}
 ///       void on_startup() override { ... }
 ///       void on_update(float dt) override { ... }
 ///   };
@@ -21,7 +22,7 @@ class Window;
 /// @endcode
 class Application {
 public:
-    Application();
+    explicit Application(const WindowDesc& desc = {});
     virtual ~Application();
 
     /// Run the main loop. Blocks until the window closes.
@@ -30,6 +31,10 @@ public:
 
     /// Access the underlying window (SDL3 + OpenGL).
     [[nodiscard]] Window& window();
+
+    /// Seconds since the last frame (wall-clock). Only valid
+    /// inside on_update() / after run().
+    [[nodiscard]] float delta_time() const { return last_dt_; }
 
 protected:
     /// Called once after the window is created, before the first frame.
@@ -44,6 +49,7 @@ protected:
 private:
     struct Impl;
     std::unique_ptr<Impl> impl_;
+    float last_dt_ = 0.0f;
 };
 
 } // namespace exd::app

@@ -37,9 +37,6 @@ add_library(exd-app STATIC
     src/application.cpp
     src/window.cpp
     src/event_state.cpp
-    src/services/clipboard_service.cpp
-    src/services/file_dialog_service.cpp
-    src/services/notification_service.cpp
 )
 
 target_include_directories(exd-app PUBLIC
@@ -81,7 +78,6 @@ if(EXD_APP_BUILD_TESTS)
     add_executable(exd-app-tests
         tests/test_event_state.cpp
         tests/test_window_state.cpp
-        tests/test_services.cpp
         tests/test_application.cpp
         tests/test_umbrella.cpp
     )

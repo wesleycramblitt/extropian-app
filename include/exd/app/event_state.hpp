@@ -5,20 +5,25 @@
 
 namespace exd::app {
 
+/// Maximum number of mouse buttons we track (SDL defines 1-5).
+constexpr int kMaxMouseButtons = 8;
+
+/// Per-frame input snapshot. Created by Window::poll_events() each frame.
 class EventState {
 public:
     EventState() = default;
-    EventState(SDL_Event* events, int num_events, const bool* keyboard_state,
-               float mouse_rel_x, float mouse_rel_y);
-    void set_state(SDL_Event* events, int num_events, const bool* keyboard_state,
-                    float mouse_rel_x, float mouse_rel_y);
 
     /// True only on the frame that `sc` was released.
     bool was_key_released(SDL_Scancode sc) const {
         return sc < SDL_SCANCODE_COUNT && key_up_[sc];
     }
 
-    /// Reset all per-frame key-up flags (called at the start of each poll).
+    /// True if the mouse button is currently held this frame.
+    bool mouse_button_down(int button) const {
+        return button >= 0 && button < kMaxMouseButtons && mouse_buttons_[button];
+    }
+
+    /// Reset all per-frame key-up flags.
     void reset_keys() { key_up_.fill(false); }
 
     /// Mark a key as just-released this frame.
@@ -26,14 +31,35 @@ public:
         if (sc < SDL_SCANCODE_COUNT) key_up_[sc] = true;
     }
 
-    const bool* keyboard_state = nullptr;
-    SDL_Event* events = nullptr;
-    int num_events = 0;
-    float mouse_rel_x = 0;
-    float mouse_rel_y = 0;
+    /// Set mouse button state (called by Window::poll_events).
+    void set_mouse_button(int button, bool down) {
+        if (button >= 0 && button < kMaxMouseButtons) mouse_buttons_[button] = down;
+    }
+
+    /// Reset all per-frame state (called at the start of each poll).
+    void begin_frame();
+
+    // ── Public state fields (read by renderer) ──
+
+    const bool* keyboard_state = nullptr;     ///< SDL_GetKeyboardState view
+    SDL_Event*  events         = nullptr;     ///< raw event buffer
+    int         num_events     = 0;
+    float       mouse_rel_x    = 0.0f;        ///< accumulated relative X this frame
+    float       mouse_rel_y    = 0.0f;        ///< accumulated relative Y this frame
+
+    // Gamepad state (from first connected gamepad)
+    float       gamepad_left_x  = 0.0f;
+    float       gamepad_left_y  = 0.0f;
+    float       gamepad_right_x = 0.0f;
+    float       gamepad_right_y = 0.0f;
+    float       gamepad_left_trigger  = 0.0f;
+    float       gamepad_right_trigger = 0.0f;
+    Uint16      gamepad_buttons = 0;          ///< bitmask of held buttons
 
 private:
+    friend class Window;
     std::array<bool, SDL_SCANCODE_COUNT> key_up_ = {};
+    std::array<bool, kMaxMouseButtons>   mouse_buttons_ = {};
 };
 
 } // namespace exd::app

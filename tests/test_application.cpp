@@ -6,41 +6,36 @@
 namespace exd::app {
 namespace {
 
-/// Test harness that records lifecycle callbacks and detects display availability.
 class SpyApplication : public Application {
 public:
     bool startup_called  = false;
     bool shutdown_called = false;
     int  update_count    = 0;
     bool should_exit_on_update = false;
-    bool window_created  = false;
+    bool window_valid    = false;
+
+    explicit SpyApplication(const WindowDesc& d = {}) : Application(d) {}
 
 protected:
     void on_startup() override {
         startup_called = true;
-        // Let subclasses know whether the Window backed by a real display
-        window_created = (window().sdl_window != nullptr &&
-                          window().gl_context != nullptr);
+        window_valid = window().is_valid();
     }
-
     void on_update(float /*dt*/) override {
         ++update_count;
-        if (should_exit_on_update) {
-            window().should_close = true;
-        }
+        if (should_exit_on_update) window().close();
     }
-
     void on_shutdown() override { shutdown_called = true; }
 };
 
-TEST_CASE("Application: construction and destruction without run()", "[application]") {
+TEST_CASE("Application: construction without run()", "[application]") {
     SpyApplication app;
     CHECK_FALSE(app.startup_called);
     CHECK_FALSE(app.shutdown_called);
     CHECK(app.update_count == 0);
 }
 
-TEST_CASE("Application: destructor calls on_shutdown only if running", "[application]") {
+TEST_CASE("Application: destructor without run()", "[application]") {
     {
         SpyApplication app;
         CHECK_FALSE(app.startup_called);
@@ -52,98 +47,96 @@ TEST_CASE("Application: destructor calls on_shutdown only if running", "[applica
 TEST_CASE("Application: run lifecycle", "[application][display]") {
     SpyApplication app;
     app.should_exit_on_update = true;
-
     int result = app.run();
-
-    if (!app.window_created) {
-        SKIP("Window / GL context creation failed — no usable display");
-    }
-
+    if (!app.window_valid) { SKIP("Window creation failed — no usable display"); }
     CHECK(result == 0);
     CHECK(app.startup_called);
     CHECK(app.shutdown_called);
     CHECK(app.update_count >= 1);
 }
 
-TEST_CASE("Application: window() returns valid reference during on_startup", "[application][display]") {
+TEST_CASE("Application: window() returns valid reference", "[application][display]") {
     struct WindowAccessApp : public SpyApplication {
         bool accessor_worked = false;
         void on_startup() override {
             SpyApplication::on_startup();
             Window& w = window();
-            accessor_worked = (&w != nullptr);
+            accessor_worked = (&w != nullptr && w.is_valid());
         }
     };
-
     WindowAccessApp wa;
     wa.should_exit_on_update = true;
-
     int result = wa.run();
-
-    if (!wa.window_created) {
-        SKIP("Window / GL context creation failed — no usable display");
-    }
-
+    if (!wa.window_valid) { SKIP("Window creation failed — no usable display"); }
     CHECK(result == 0);
     CHECK(wa.accessor_worked);
 }
 
 TEST_CASE("Application: default callbacks are no-ops", "[application]") {
-    struct DefaultApp : public Application {};
+    struct DefaultApp : public Application { using Application::Application; };
     DefaultApp app;
     SUCCEED("DefaultApp constructed");
 }
 
-TEST_CASE("Application: running flag prevents double on_shutdown", "[application][display]") {
-    int shutdown_count = 0;
-    struct ShutdownCountingApp : public SpyApplication {
-        int* counter = nullptr;
-        void on_shutdown() override {
-            SpyApplication::on_shutdown();
-            if (counter) ++(*counter);
-        }
+TEST_CASE("Application: shutdown not called twice", "[application][display]") {
+    int count = 0;
+    struct CountingApp : public SpyApplication {
+        int* ctr = nullptr;
+        void on_shutdown() override { SpyApplication::on_shutdown(); if (ctr) ++(*ctr); }
     };
-
-    ShutdownCountingApp app;
-    app.counter = &shutdown_count;
+    CountingApp app;
+    app.ctr = &count;
     app.should_exit_on_update = true;
-
-    app.run();
-
-    if (!app.window_created) {
-        SKIP("Window / GL context creation failed — no usable display");
-    }
-
-    CHECK(shutdown_count == 1);
+    std::ignore = app.run();
+    if (!app.window_valid) { SKIP("Window creation failed — no usable display"); }
+    CHECK(count == 1);
 }
 
-TEST_CASE("Application: startup called before first update", "[application][display]") {
-    struct OrderCheckingApp : public SpyApplication {
-        bool startup_before_update = false;
+TEST_CASE("Application: startup before first update", "[application][display]") {
+    struct OrderApp : public SpyApplication {
         bool startup_done = false;
+        bool order_ok = false;
+        void on_startup() override { SpyApplication::on_startup(); startup_done = true; }
+        void on_update(float dt) override { SpyApplication::on_update(dt); order_ok = startup_done; }
+    };
+    OrderApp app;
+    app.should_exit_on_update = true;
+    int result = app.run();
+    if (!app.window_valid) { SKIP("Window creation failed — no usable display"); }
+    CHECK(result == 0);
+    CHECK(app.order_ok);
+}
 
-        void on_startup() override {
-            SpyApplication::on_startup();
-            startup_done = true;
-        }
+TEST_CASE("Application: invalid window returns error code", "[application]") {
+    // Providing invalid GL version should fail
+    WindowDesc desc;
+    desc.gl_major = 99;
+    desc.gl_minor = 99;
+    SpyApplication app(desc);
+    int result = app.run();
+    // Should return 1 when window is invalid
+    if (app.window_valid) {
+        // Somehow succeeded — run worked, that's fine too
+        CHECK(result == 0);
+    } else {
+        CHECK(result == 1);
+    }
+}
 
+TEST_CASE("Application: delta_time exposed", "[application][display]") {
+    struct DtApp : public SpyApplication {
+        float captured_dt = -1.0f;
         void on_update(float dt) override {
             SpyApplication::on_update(dt);
-            startup_before_update = startup_done;
+            captured_dt = delta_time();
         }
     };
-
-    OrderCheckingApp app;
+    DtApp app;
     app.should_exit_on_update = true;
-
-    int result = app.run();
-
-    if (!app.window_created) {
-        SKIP("Window / GL context creation failed — no usable display");
-    }
-
-    CHECK(result == 0);
-    CHECK(app.startup_before_update);
+    std::ignore = app.run();
+    if (!app.window_valid) { SKIP("Window creation failed — no usable display"); }
+    CHECK(app.captured_dt >= 0.0f);
+    CHECK(app.captured_dt < 1.0f); // first frame should be tiny
 }
 
 } // namespace

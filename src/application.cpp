@@ -1,5 +1,4 @@
 #include <exd/app/application.hpp>
-#include <exd/app/window.hpp>
 
 #include <cstdio>
 #include <chrono>
@@ -11,35 +10,38 @@ struct Application::Impl {
     bool running = false;
 };
 
-Application::Application()
-    : impl_(std::make_unique<Impl>()) {}
+Application::Application(const WindowDesc& desc)
+    : impl_(std::make_unique<Impl>())
+{
+    impl_->window = std::make_unique<Window>(desc);
+}
 
 Application::~Application() {
     if (impl_->running) on_shutdown();
 }
 
 int Application::run() {
+    if (!impl_->window->is_valid()) {
+        std::fprintf(stderr, "[App] Window creation failed — aborting run()\n");
+        return 1;
+    }
+
     std::printf("[App] Starting...\n");
 
-    // Create window (SDL3 + OpenGL)
-    impl_->window = std::make_unique<Window>();
-
-    // App-specific setup
     on_startup();
 
-    // Main loop
     impl_->running = true;
     using clock = std::chrono::steady_clock;
     auto last_frame = clock::now();
 
-    while (impl_->running && !impl_->window->should_close) {
+    while (impl_->running && !impl_->window->should_close()) {
         auto frame_start = clock::now();
-        float dt = std::chrono::duration<float>(frame_start - last_frame).count();
+        last_dt_ = std::chrono::duration<float>(frame_start - last_frame).count();
         last_frame = frame_start;
 
         impl_->window->poll_events();
 
-        on_update(dt);
+        on_update(last_dt_);
 
         impl_->window->swap_buffers();
     }
