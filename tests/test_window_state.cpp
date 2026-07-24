@@ -11,6 +11,7 @@ namespace {
 struct TestWindowState : public WindowState {
     int w = 0, h = 0;
     float a = 0.0f;
+    bool key_pressed = false;
     bool key_rel = false;
     bool mb_down = false;
     int  reset_count = 0;
@@ -20,6 +21,7 @@ struct TestWindowState : public WindowState {
         height = h;
         aspect = a;
     }
+    bool was_key_pressed(int scancode) const override { return key_pressed && scancode == 42; }
     bool was_key_released(int scancode) const override { return key_rel && scancode == 42; }
     void reset_mouse_delta() override { ++reset_count; }
     bool mouse_button_down(int button) const override { return mb_down && button == 1; }
@@ -43,6 +45,15 @@ TEST_CASE("WindowState: get_dimensions virtual dispatch", "[window_state]") {
     CHECK(width == 1920);
     CHECK(height == 1080);
     CHECK(aspect == Catch::Approx(1920.0f / 1080.0f));
+}
+
+TEST_CASE("WindowState: was_key_pressed virtual dispatch", "[window_state]") {
+    TestWindowState ws;
+    ws.key_pressed = false;
+    CHECK_FALSE(ws.was_key_pressed(42));
+    ws.key_pressed = true;
+    CHECK(ws.was_key_pressed(42));
+    CHECK_FALSE(ws.was_key_pressed(0));
 }
 
 TEST_CASE("WindowState: was_key_released virtual dispatch", "[window_state]") {
@@ -93,6 +104,12 @@ TEST_CASE("CursorMode: enum values", "[window_state]") {
     CHECK(static_cast<int>(CursorMode::Captured) == 2);
 }
 
+TEST_CASE("WindowState: scroll state defaults", "[window_state]") {
+    TestWindowState ws;
+    CHECK(ws.scroll_x == 0.0f);
+    CHECK(ws.scroll_y == 0.0f);
+}
+
 TEST_CASE("WindowState: gamepad state defaults", "[window_state]") {
     TestWindowState ws;
     CHECK(ws.gamepad_left_x == 0.0f);
@@ -109,6 +126,7 @@ TEST_CASE("WindowState: polymorphic deletion through base pointer", "[window_sta
     struct DtorState : public WindowState {
         ~DtorState() override { destroyed = true; }
         void get_dimensions(int& w, int& h, float& a) const override { w = h = 0; a = 1.0f; }
+        bool was_key_pressed(int) const override { return false; }
         bool was_key_released(int) const override { return false; }
         void reset_mouse_delta() override {}
         bool mouse_button_down(int) const override { return false; }

@@ -13,6 +13,11 @@ class EventState {
 public:
     EventState() = default;
 
+    /// True only on the frame that `sc` was pressed down.
+    bool was_key_pressed(SDL_Scancode sc) const {
+        return sc < SDL_SCANCODE_COUNT && key_down_[sc];
+    }
+
     /// True only on the frame that `sc` was released.
     bool was_key_released(SDL_Scancode sc) const {
         return sc < SDL_SCANCODE_COUNT && key_up_[sc];
@@ -23,8 +28,10 @@ public:
         return button >= 0 && button < kMaxMouseButtons && mouse_buttons_[button];
     }
 
-    /// Reset all per-frame key-up flags.
-    void reset_keys() { key_up_.fill(false); }
+    /// Mark a key as just-pressed this frame.
+    void set_key_down(SDL_Scancode sc) {
+        if (sc < SDL_SCANCODE_COUNT) key_down_[sc] = true;
+    }
 
     /// Mark a key as just-released this frame.
     void set_key_up(SDL_Scancode sc) {
@@ -46,6 +53,8 @@ public:
     int         num_events     = 0;
     float       mouse_rel_x    = 0.0f;        ///< accumulated relative X this frame
     float       mouse_rel_y    = 0.0f;        ///< accumulated relative Y this frame
+    float       scroll_x       = 0.0f;        ///< scroll delta X this frame
+    float       scroll_y       = 0.0f;        ///< scroll delta Y this frame
 
     // Gamepad state (from first connected gamepad)
     float       gamepad_left_x  = 0.0f;
@@ -58,7 +67,8 @@ public:
 
 private:
     friend class Window;
-    std::array<bool, SDL_SCANCODE_COUNT> key_up_ = {};
+    std::array<bool, SDL_SCANCODE_COUNT> key_down_ = {};
+    std::array<bool, SDL_SCANCODE_COUNT> key_up_   = {};
     std::array<bool, kMaxMouseButtons>   mouse_buttons_ = {};
 };
 

@@ -78,6 +78,7 @@ public:
 
     // ── Input queries ─────────────────────────────────────────
 
+    bool was_key_pressed(int scancode) const override;
     bool was_key_released(int scancode) const override;
     bool mouse_button_down(int button) const override;
 
@@ -87,7 +88,9 @@ public:
     void set_cursor_mode(CursorMode mode);
     [[nodiscard]] CursorMode cursor_mode() const { return cursor_mode_; }
 
-    // ── Accessors for SDL interop (rarely needed) ─────────────
+    // ── Window decoration ─────────────────────────────────────
+
+    void set_icon(SDL_Surface* surface);
 
     [[nodiscard]] SDL_Window*   native_window()  const { return sdl_window_; }
     [[nodiscard]] SDL_GLContext native_context() const { return gl_context_; }

@@ -46,6 +46,9 @@ struct WindowState {
     /// Retrieve the current framebuffer dimensions and aspect ratio.
     virtual void get_dimensions(int& w, int& h, float& aspect) const = 0;
 
+    /// True on the frame that the key was pressed down.
+    virtual bool was_key_pressed(int scancode) const = 0;
+
     /// True on the frame that the key was released.
     virtual bool was_key_released(int scancode) const = 0;
 
@@ -61,6 +64,8 @@ struct WindowState {
     const bool* keyboard_state  = nullptr;   ///< SDL_GetKeyboardState view
     float       mouse_rel_x     = 0.0f;
     float       mouse_rel_y     = 0.0f;
+    float       scroll_x        = 0.0f;
+    float       scroll_y        = 0.0f;
     bool        grid_visible    = true;
     bool        wireframe       = false;
 

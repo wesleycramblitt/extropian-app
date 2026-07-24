@@ -2,17 +2,20 @@
 #include <exd/core/macros.hpp>
 #include <exd/core/logging.hpp>
 #include <glad/gl.h>
-#include <cstdlib>
 
 namespace exd::app {
 
 // ── EventState frame lifecycle ────────────────────────────────
 
 void EventState::begin_frame() {
+    key_down_.fill(false);
     key_up_.fill(false);
     mouse_buttons_.fill(false);
-    // public fields preserved across frames (keyboard_state, events,
-    // mouse_rel_x/y, gamepad state) are set explicitly by poll_events()
+    scroll_x = 0.0f;
+    scroll_y = 0.0f;
+    // Other public fields (keyboard_state, events, mouse_rel_x/y,
+    // gamepad state) are set explicitly by poll_events() and
+    // persist across frames by design.
 }
 
 // ── Window construction ───────────────────────────────────────
@@ -109,6 +112,10 @@ void Window::set_title(const std::string& title) {
     if (sdl_window_) SDL_SetWindowTitle(sdl_window_, title.c_str());
 }
 
+void Window::set_icon(SDL_Surface* surface) {
+    if (sdl_window_ && surface) SDL_SetWindowIcon(sdl_window_, surface);
+}
+
 // ── Event polling ──────────────────────────────────────────────
 
 void Window::poll_events() {
@@ -130,6 +137,7 @@ void Window::poll_events() {
             break;
 
         case SDL_EVENT_KEY_DOWN:
+            event_state.set_key_down(ev.key.scancode);
             if (ev.key.scancode == SDL_SCANCODE_ESCAPE && input_mode == InputMode::FPS) {
                 should_close_ = true;
                 if (desc_.callbacks.on_close) desc_.callbacks.on_close();
@@ -158,6 +166,11 @@ void Window::poll_events() {
 
         case SDL_EVENT_MOUSE_BUTTON_UP:
             event_state.set_mouse_button(ev.button.button, false);
+            break;
+
+        case SDL_EVENT_MOUSE_WHEEL:
+            event_state.scroll_x += ev.wheel.x;
+            event_state.scroll_y += ev.wheel.y;
             break;
 
         case SDL_EVENT_WINDOW_RESIZED:
@@ -213,6 +226,8 @@ void Window::poll_events() {
     keyboard_state     = event_state.keyboard_state;
     mouse_rel_x        = event_state.mouse_rel_x;
     mouse_rel_y        = event_state.mouse_rel_y;
+    scroll_x           = event_state.scroll_x;
+    scroll_y           = event_state.scroll_y;
     gamepad_left_x     = event_state.gamepad_left_x;
     gamepad_left_y     = event_state.gamepad_left_y;
     gamepad_right_x    = event_state.gamepad_right_x;
@@ -255,6 +270,10 @@ void Window::reset_mouse_delta() {
     event_state.mouse_rel_y = 0.0f;
     mouse_rel_x = 0.0f;
     mouse_rel_y = 0.0f;
+}
+
+bool Window::was_key_pressed(int scancode) const {
+    return event_state.was_key_pressed(static_cast<SDL_Scancode>(scancode));
 }
 
 bool Window::was_key_released(int scancode) const {

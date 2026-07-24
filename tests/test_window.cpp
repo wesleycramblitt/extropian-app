@@ -58,6 +58,8 @@ TEST_CASE("Window: set_input_mode and cursor_mode", "[window][display]") {
 TEST_CASE("Window: was_key_released defaults to false", "[window][display]") {
     Window win;
     if (!win.is_valid()) { SKIP("Window creation failed"); }
+    CHECK_FALSE(win.was_key_pressed(SDL_SCANCODE_A));
+    CHECK_FALSE(win.was_key_pressed(SDL_SCANCODE_SPACE));
     CHECK_FALSE(win.was_key_released(SDL_SCANCODE_A));
     CHECK_FALSE(win.was_key_released(SDL_SCANCODE_SPACE));
 }
@@ -136,6 +138,21 @@ TEST_CASE("Window: grid_visible and wireframe defaults", "[window][display]") {
     if (!win.is_valid()) { SKIP("Window creation failed"); }
     CHECK(win.grid_visible == true);
     CHECK(win.wireframe == false);
+}
+
+TEST_CASE("Window: scroll defaults to zero", "[window][display]") {
+    Window win;
+    if (!win.is_valid()) { SKIP("Window creation failed"); }
+    CHECK(win.scroll_x == 0.0f);
+    CHECK(win.scroll_y == 0.0f);
+    CHECK(win.events().scroll_x == 0.0f);
+    CHECK(win.events().scroll_y == 0.0f);
+}
+
+TEST_CASE("Window: set_icon does not crash with null", "[window][display]") {
+    Window win;
+    if (!win.is_valid()) { SKIP("Window creation failed"); }
+    CHECK_NOTHROW(win.set_icon(nullptr));
 }
 
 } // namespace
